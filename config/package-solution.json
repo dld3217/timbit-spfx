@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "timbit-spfx-client-side-solution",
+    "id": "e5e87860-e2cb-43da-8f1c-6f6bdfa00b2e",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.20.0"
+    },
+    "metadata": {
+      "shortDescription": { "default": "Tim·bit History — HPE Networking weekly sales enablement archive" },
+      "longDescription": { "default": "Tim·bit History — HPE Networking weekly sales enablement archive" },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "timbit-spfx Feature",
+        "description": "The feature that activates elements of the timbit-spfx solution.",
+        "id": "2a6dfec8-c690-48ad-95de-82a492661613",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/timbit-spfx.sppkg"
+  }
+}
