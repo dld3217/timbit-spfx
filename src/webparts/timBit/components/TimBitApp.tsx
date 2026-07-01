@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { SPFI } from '@pnp/sp';
 import { ITimbit } from '../models/ITimbit';
+
+const VERSION = '1.0.1.0';
 import { getPublishedTimBits, getAllTimBits } from '../services/TimbitService';
 import TimbitList from './TimbitList/TimbitList';
 import TimbitAdmin from './TimbitAdmin/TimbitAdmin';
@@ -55,6 +57,7 @@ const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList })
           <NavBtn active={view === 'admin'} onClick={() => setView('admin')}>Add / Edit Entries</NavBtn>
           <NavBtn active={view === 'email'} onClick={() => setView('email')}>Generate Email</NavBtn>
           <NavBtn active={view === 'import'} onClick={() => setView('import')}>Import History</NavBtn>
+          <span style={{ marginLeft: 'auto', fontFamily: "'IBM Plex Mono',monospace", fontSize: 10, color: '#3a4a5c', letterSpacing: '0.08em' }}>v{VERSION}</span>
         </div>
       )}
 
@@ -91,3 +94,4 @@ const NavBtn: React.FC<{ active: boolean; onClick: () => void; children: React.R
 );
 
 export default TimBitApp;
+
