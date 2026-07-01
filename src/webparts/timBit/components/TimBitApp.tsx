@@ -1,14 +1,13 @@
 import * as React from 'react';
 import { SPFI } from '@pnp/sp';
 import { ITimbit } from '../models/ITimbit';
-
 import { getPublishedTimBits, getAllTimBits } from '../services/TimbitService';
-
-const VERSION = '1.0.2.0';
 import TimbitList from './TimbitList/TimbitList';
 import TimbitAdmin from './TimbitAdmin/TimbitAdmin';
 import TimbitEmailPreview from './TimbitEmailPreview/TimbitEmailPreview';
 import TimbitImport from './TimbitImport/TimbitImport';
+
+const VERSION = '1.0.2.0';
 
 export interface ITimBitAppProps {
   sp: SPFI;
