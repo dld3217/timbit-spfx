@@ -7,7 +7,7 @@ import TimbitAdmin from './TimbitAdmin/TimbitAdmin';
 import TimbitEmailPreview from './TimbitEmailPreview/TimbitEmailPreview';
 import TimbitImport from './TimbitImport/TimbitImport';
 
-const VERSION = '1.0.4.0';
+const VERSION = '1.0.5.0';
 
 export interface ITimBitAppProps {
   sp: SPFI;
@@ -94,6 +94,7 @@ const NavBtn: React.FC<{ active: boolean; onClick: () => void; children: React.R
 );
 
 export default TimBitApp;
+
 
 
 

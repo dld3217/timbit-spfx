@@ -102,6 +102,7 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
   const [htmlOutput, setHtmlOutput] = React.useState('');
   const [to, setTo]             = React.useState('');
   const [cc, setCc]             = React.useState('');
+  const [bcc, setBcc]           = React.useState('');
   const [subject, setSubject]   = React.useState('');
   const [sending, setSending]   = React.useState(false);
   const [sendMsg, setSendMsg]   = React.useState('');
@@ -124,6 +125,7 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
         Title: subject.trim() || 'Tim·bit Email',
         To: to.trim(),
         CC: cc.trim(),
+        BCC: bcc.trim(),
         Subject: subject.trim(),
         Body: htmlOutput
       });
@@ -142,7 +144,7 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
 
       {/* COMPOSE HEADER */}
       <div style={{ background: '#fff', border: '1px solid #d1d9e0', borderRadius: 6, padding: '20px 24px', marginBottom: 20 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px', marginBottom: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px 24px', marginBottom: 12 }}>
           <div>
             <label style={fieldLabel}>To</label>
             <input style={fieldInput} value={to} onChange={e => setTo(e.target.value)} placeholder="distribution list or email" />
@@ -150,6 +152,10 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
           <div>
             <label style={fieldLabel}>CC</label>
             <input style={fieldInput} value={cc} onChange={e => setCc(e.target.value)} placeholder="optional" />
+          </div>
+          <div>
+            <label style={fieldLabel}>BCC</label>
+            <input style={fieldInput} value={bcc} onChange={e => setBcc(e.target.value)} placeholder="optional" />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
             <label style={fieldLabel}>Subject</label>
