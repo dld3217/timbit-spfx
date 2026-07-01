@@ -7,18 +7,17 @@ import TimbitAdmin from './TimbitAdmin/TimbitAdmin';
 import TimbitEmailPreview from './TimbitEmailPreview/TimbitEmailPreview';
 import TimbitImport from './TimbitImport/TimbitImport';
 
-const VERSION = '1.0.3.0';
+const VERSION = '1.0.4.0';
 
 export interface ITimBitAppProps {
   sp: SPFI;
   isAdmin: boolean;
   distributionList: string;
-  sendFlowUrl: string;
 }
 
 type View = 'list' | 'admin' | 'email' | 'import';
 
-const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList, sendFlowUrl }) => {
+const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList }) => {
   const [entries, setEntries] = React.useState<ITimbit[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [view, setView] = React.useState<View>('list');
@@ -69,7 +68,7 @@ const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList, s
       ) : view === 'admin' ? (
         <TimbitAdmin sp={sp} entries={entries} onSaved={loadEntries} />
       ) : view === 'email' ? (
-        <TimbitEmailPreview sp={sp} distributionList={distributionList} sendFlowUrl={sendFlowUrl} />
+        <TimbitEmailPreview sp={sp} distributionList={distributionList} />
       ) : (
         <TimbitImport sp={sp} existingTitles={new Set(entries.map(e => e.title))} onDone={loadEntries} />
       )}
@@ -95,6 +94,7 @@ const NavBtn: React.FC<{ active: boolean; onClick: () => void; children: React.R
 );
 
 export default TimBitApp;
+
 
 
 

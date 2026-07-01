@@ -14,7 +14,6 @@ import { ITimBitAppProps } from './components/TimBitApp';
 export interface ITimBitWebPartProps {
   adminEmails: string;
   distributionList: string;
-  sendFlowUrl: string;
 }
 
 export default class TimBitWebPart extends BaseClientSideWebPart<ITimBitWebPartProps> {
@@ -35,8 +34,7 @@ export default class TimBitWebPart extends BaseClientSideWebPart<ITimBitWebPartP
     const element: React.ReactElement<ITimBitAppProps> = React.createElement(TimBitApp, {
       sp: this._sp,
       isAdmin,
-      distributionList: this.properties.distributionList || '',
-      sendFlowUrl: this.properties.sendFlowUrl || ''
+      distributionList: this.properties.distributionList || ''
     });
 
     ReactDom.render(element, this.domElement);
@@ -75,13 +73,6 @@ export default class TimBitWebPart extends BaseClientSideWebPart<ITimBitWebPartP
                   description: 'Pre-populated in the To field when generating the weekly email',
                   placeholder: 'e.g. hpe-networking-sales@hpe.com'
                 }),
-                PropertyPaneTextField('sendFlowUrl', {
-                  label: 'Send Email Flow URL',
-                  description: 'Power Automate HTTP trigger URL for sending the weekly email',
-                  placeholder: 'https://prod-...',
-                  multiline: true,
-                  rows: 3
-                })
               ]
             }
           ]

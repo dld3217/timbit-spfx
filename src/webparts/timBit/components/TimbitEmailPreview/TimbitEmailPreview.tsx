@@ -3,10 +3,11 @@ import { SPFI } from '@pnp/sp';
 import { ITimbit, FORMAT_LABELS } from '../../models/ITimbit';
 import { getLatestWeekTimBits } from '../../services/TimbitService';
 
+const QUEUE_LIST = 'TimBitEmailQueue';
+
 interface ITimbitEmailPreviewProps {
   sp: SPFI;
   distributionList: string;
-  sendFlowUrl: string;
 }
 
 function buildEmailHtml(entries: ITimbit[]): string {
@@ -95,7 +96,7 @@ const fieldInput: React.CSSProperties = {
   padding: '8px 10px', boxSizing: 'border-box'
 };
 
-const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributionList, sendFlowUrl }) => {
+const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributionList }) => {
   const [entries, setEntries]   = React.useState<ITimbit[]>([]);
   const [loading, setLoading]   = React.useState(true);
   const [htmlOutput, setHtmlOutput] = React.useState('');
@@ -116,22 +117,19 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
   }, [sp, distributionList]);
 
   const handleSend = async (): Promise<void> => {
-    if (!sendFlowUrl) { setSendMsg('No flow URL configured — add it in the web part property pane.'); return; }
-    if (!to.trim())   { setSendMsg('Please enter a To address.'); return; }
+    if (!to.trim()) { setSendMsg('Please enter a To address.'); return; }
     setSending(true); setSendMsg('');
     try {
-      const resp = await fetch(sendFlowUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: to.trim(), cc: cc.trim(), subject: subject.trim(), body: htmlOutput })
+      await sp.web.lists.getByTitle(QUEUE_LIST).items.add({
+        Title: subject.trim() || 'Tim·bit Email',
+        To: to.trim(),
+        CC: cc.trim(),
+        Subject: subject.trim(),
+        Body: htmlOutput
       });
-      if (resp.ok || resp.status === 202) {
-        setSendMsg('Email sent successfully!');
-      } else {
-        setSendMsg(`Send failed (${resp.status}). Check the flow URL.`);
-      }
+      setSendMsg('Email queued — it will be sent shortly!');
     } catch (e) {
-      setSendMsg('Send failed: ' + String(e));
+      setSendMsg('Failed to queue email: ' + String(e));
     } finally {
       setSending(false);
     }
