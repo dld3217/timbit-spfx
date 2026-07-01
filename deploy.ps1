@@ -20,7 +20,7 @@ Set-Content $configPath $raw -Encoding utf8
 # Sync VERSION constant in TimBitApp.tsx so the badge always matches
 $appPath = "$PSScriptRoot\src\webparts\timBit\components\TimBitApp.tsx"
 $appRaw = Get-Content $appPath -Raw
-$appRaw = $appRaw -replace "const VERSION = '[^']*';", "const VERSION = '$newVer';"
+$appRaw = $appRaw -replace "(?m)^const VERSION = '[^']*';", "const VERSION = '$newVer';"
 Set-Content $appPath $appRaw -Encoding utf8
 
 $gulp = "$PSScriptRoot\node_modules\.bin\gulp.cmd"
