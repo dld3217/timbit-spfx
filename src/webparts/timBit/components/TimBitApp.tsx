@@ -5,6 +5,7 @@ import { getPublishedTimBits, getAllTimBits } from '../services/TimbitService';
 import TimbitList from './TimbitList/TimbitList';
 import TimbitAdmin from './TimbitAdmin/TimbitAdmin';
 import TimbitEmailPreview from './TimbitEmailPreview/TimbitEmailPreview';
+import TimbitImport from './TimbitImport/TimbitImport';
 
 export interface ITimBitAppProps {
   sp: SPFI;
@@ -12,7 +13,7 @@ export interface ITimBitAppProps {
   distributionList: string;
 }
 
-type View = 'list' | 'admin' | 'email';
+type View = 'list' | 'admin' | 'email' | 'import';
 
 const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList }) => {
   const [entries, setEntries] = React.useState<ITimbit[]>([]);
@@ -53,6 +54,7 @@ const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList })
           <NavBtn active={view === 'list'} onClick={() => setView('list')}>Archive</NavBtn>
           <NavBtn active={view === 'admin'} onClick={() => setView('admin')}>Add / Edit Entries</NavBtn>
           <NavBtn active={view === 'email'} onClick={() => setView('email')}>Generate Email</NavBtn>
+          <NavBtn active={view === 'import'} onClick={() => setView('import')}>Import History</NavBtn>
         </div>
       )}
 
@@ -62,8 +64,10 @@ const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList })
         <TimbitList entries={entries} isAdmin={isAdmin} />
       ) : view === 'admin' ? (
         <TimbitAdmin sp={sp} entries={entries} onSaved={loadEntries} />
-      ) : (
+      ) : view === 'email' ? (
         <TimbitEmailPreview sp={sp} distributionList={distributionList} />
+      ) : (
+        <TimbitImport sp={sp} existingTitles={new Set(entries.map(e => e.title))} onDone={loadEntries} />
       )}
     </div>
   );
