@@ -6,19 +6,19 @@ import TimbitList from './TimbitList/TimbitList';
 import TimbitAdmin from './TimbitAdmin/TimbitAdmin';
 import TimbitEmailPreview from './TimbitEmailPreview/TimbitEmailPreview';
 import TimbitImport from './TimbitImport/TimbitImport';
+import { ADMIN_GUIDE_HTML } from './AdminGuide/AdminGuideHtml';
 
-const VERSION = '1.0.6.0';
+const VERSION = '1.0.7.0';
 
 export interface ITimBitAppProps {
   sp: SPFI;
   isAdmin: boolean;
   distributionList: string;
-  adminGuideUrl: string;
 }
 
 type View = 'list' | 'admin' | 'email' | 'import';
 
-const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList, adminGuideUrl }) => {
+const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList }) => {
   const [entries, setEntries]   = React.useState<ITimbit[]>([]);
   const [loading, setLoading]   = React.useState(true);
   const [view, setView]         = React.useState<View>('list');
@@ -45,9 +45,7 @@ const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList, a
           <NavBtn active={view === 'admin'} onClick={() => setView('admin')}>Add / Edit Entries</NavBtn>
           <NavBtn active={view === 'email'} onClick={() => setView('email')}>Generate Email</NavBtn>
           <NavBtn active={view === 'import'} onClick={() => setView('import')}>Import History</NavBtn>
-          {adminGuideUrl && (
-            <NavBtn active={false} onClick={() => setGuideOpen(true)}>Admin Guide</NavBtn>
-          )}
+          <NavBtn active={false} onClick={() => setGuideOpen(true)}>Admin Guide</NavBtn>
           <span style={{ marginLeft: 'auto', fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, fontWeight: 700, color: '#a0b4c8', letterSpacing: '0.08em' }}>v{VERSION}</span>
         </div>
       )}
@@ -73,7 +71,7 @@ const TimBitApp: React.FC<ITimBitAppProps> = ({ sp, isAdmin, distributionList, a
             <button onClick={() => setGuideOpen(false)} style={{ marginLeft: 'auto', background: 'transparent', border: '1px solid #3a4a5c', borderRadius: 4, color: '#a0b4c8', fontSize: 13, fontWeight: 700, padding: '4px 12px', cursor: 'pointer' }}>✕ Close</button>
           </div>
           <iframe
-            src={adminGuideUrl}
+            srcDoc={ADMIN_GUIDE_HTML}
             style={{ flex: 1, border: 'none', width: '100%' }}
             title="Tim·bit Admin Guide"
           />
@@ -101,4 +99,5 @@ const NavBtn: React.FC<{ active: boolean; onClick: () => void; children: React.R
 );
 
 export default TimBitApp;
+
 

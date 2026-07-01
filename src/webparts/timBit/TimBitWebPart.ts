@@ -14,7 +14,6 @@ import { ITimBitAppProps } from './components/TimBitApp';
 export interface ITimBitWebPartProps {
   adminEmails: string;
   distributionList: string;
-  adminGuideUrl: string;
 }
 
 export default class TimBitWebPart extends BaseClientSideWebPart<ITimBitWebPartProps> {
@@ -35,8 +34,7 @@ export default class TimBitWebPart extends BaseClientSideWebPart<ITimBitWebPartP
     const element: React.ReactElement<ITimBitAppProps> = React.createElement(TimBitApp, {
       sp: this._sp,
       isAdmin,
-      distributionList: this.properties.distributionList || '',
-      adminGuideUrl: this.properties.adminGuideUrl || ''
+      distributionList: this.properties.distributionList || ''
     });
 
     ReactDom.render(element, this.domElement);
@@ -74,11 +72,6 @@ export default class TimBitWebPart extends BaseClientSideWebPart<ITimBitWebPartP
                   label: 'Distribution List Email',
                   description: 'Pre-populated in the To field when generating the weekly email',
                   placeholder: 'e.g. hpe-networking-sales@hpe.com'
-                }),
-                PropertyPaneTextField('adminGuideUrl', {
-                  label: 'Admin Guide URL',
-                  description: 'SharePoint URL to the Admin Guide HTML file',
-                  placeholder: 'https://hpe.sharepoint.com/...'
                 })
               ]
             }
