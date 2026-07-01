@@ -6,6 +6,7 @@ import { getLatestWeekTimBits } from '../../services/TimbitService';
 interface ITimbitEmailPreviewProps {
   sp: SPFI;
   distributionList: string;
+  sendFlowUrl: string;
 }
 
 function buildEmailHtml(entries: ITimbit[]): string {
@@ -15,7 +16,7 @@ function buildEmailHtml(entries: ITimbit[]): string {
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td style="padding-bottom:6px;">
-              <span style="font-family:'IBM Plex Mono',Courier,monospace;font-size:11px;font-weight:700;color:#627282;letter-spacing:0.08em;text-transform:uppercase;">${e.date} &nbsp;·&nbsp; ${FORMAT_LABELS[e.format] || e.format}</span>
+              <span style="font-family:'IBM Plex Mono',Courier,monospace;font-size:13px;font-weight:700;color:#2a3a4a;letter-spacing:0.08em;text-transform:uppercase;">${e.date} &nbsp;·&nbsp; ${FORMAT_LABELS[e.format] || e.format}</span>
             </td>
           </tr>
           <tr>
@@ -47,8 +48,6 @@ function buildEmailHtml(entries: ITimbit[]): string {
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f2f5;">
   <tr><td align="center" style="padding:32px 16px;">
     <table width="620" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;width:100%;">
-
-      <!-- HEADER -->
       <tr>
         <td style="background:#1a2332;border-radius:6px 6px 0 0;padding:24px 32px;">
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -66,8 +65,6 @@ function buildEmailHtml(entries: ITimbit[]): string {
           </table>
         </td>
       </tr>
-
-      <!-- BODY -->
       <tr>
         <td style="background:#ffffff;padding:32px 32px 0 32px;border-left:1px solid #d1d9e0;border-right:1px solid #d1d9e0;">
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -75,14 +72,11 @@ function buildEmailHtml(entries: ITimbit[]): string {
           </table>
         </td>
       </tr>
-
-      <!-- FOOTER -->
       <tr>
         <td style="background:#ffffff;border:1px solid #d1d9e0;border-top:none;border-radius:0 0 6px 6px;padding:20px 32px;text-align:center;">
           <span style="font-family:'IBM Plex Mono',Courier,monospace;font-size:11px;color:#8a9bb0;">HPE Networking Sales — Business Development Team &nbsp;·&nbsp; For sales partnership questions, contact the BD team</span>
         </td>
       </tr>
-
     </table>
   </td></tr>
 </table>
@@ -90,32 +84,57 @@ function buildEmailHtml(entries: ITimbit[]): string {
 </html>`;
 }
 
-const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributionList }) => {
-  const [entries, setEntries] = React.useState<ITimbit[]>([]);
-  const [loading, setLoading] = React.useState(true);
+const fieldLabel: React.CSSProperties = {
+  fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700,
+  textTransform: 'uppercase', letterSpacing: '0.06em', color: '#627282',
+  marginBottom: 4, display: 'block'
+};
+const fieldInput: React.CSSProperties = {
+  width: '100%', border: '1px solid #d1d9e0', borderRadius: 4,
+  fontFamily: "'IBM Plex Sans',sans-serif", fontSize: 13, color: '#1a2332',
+  padding: '8px 10px', boxSizing: 'border-box'
+};
+
+const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributionList, sendFlowUrl }) => {
+  const [entries, setEntries]   = React.useState<ITimbit[]>([]);
+  const [loading, setLoading]   = React.useState(true);
   const [htmlOutput, setHtmlOutput] = React.useState('');
-  const [copied, setCopied] = React.useState(false);
-  const [copiedHtml, setCopiedHtml] = React.useState(false);
+  const [to, setTo]             = React.useState('');
+  const [cc, setCc]             = React.useState('');
+  const [subject, setSubject]   = React.useState('');
+  const [sending, setSending]   = React.useState(false);
+  const [sendMsg, setSendMsg]   = React.useState('');
+
   React.useEffect(() => {
     getLatestWeekTimBits(sp).then(data => {
       setEntries(data);
       setHtmlOutput(buildEmailHtml(data));
+      setTo(distributionList || '');
+      setSubject(data[0] ? `Tim·bit — Week of ${data[0].weekOf}` : 'Tim·bit — HPE Networking');
       setLoading(false);
     });
-  }, [sp]);
+  }, [sp, distributionList]);
 
-  const copyHtml = () => {
-    navigator.clipboard.writeText(htmlOutput).then(() => {
-      setCopiedHtml(true);
-      setTimeout(() => setCopiedHtml(false), 2000);
-    });
-  };
-
-  const copyTo = () => {
-    navigator.clipboard.writeText(distributionList).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+  const handleSend = async (): Promise<void> => {
+    if (!sendFlowUrl) { setSendMsg('No flow URL configured — add it in the web part property pane.'); return; }
+    if (!to.trim())   { setSendMsg('Please enter a To address.'); return; }
+    setSending(true); setSendMsg('');
+    try {
+      const resp = await fetch(sendFlowUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: to.trim(), cc: cc.trim(), subject: subject.trim(), body: htmlOutput })
+      });
+      if (resp.ok || resp.status === 202) {
+        setSendMsg('Email sent successfully!');
+      } else {
+        setSendMsg(`Send failed (${resp.status}). Check the flow URL.`);
+      }
+    } catch (e) {
+      setSendMsg('Send failed: ' + String(e));
+    } finally {
+      setSending(false);
+    }
   };
 
   if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#627282' }}>Loading latest entries…</div>;
@@ -123,54 +142,55 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '28px 24px 64px', fontFamily: "'IBM Plex Sans',sans-serif" }}>
 
-      {/* INFO BAR */}
-      <div style={{ background: '#1a2332', borderRadius: 6, padding: '14px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-        <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700, color: '#a0b4c8', textTransform: 'uppercase', letterSpacing: '0.10em' }}>
-          This week: <strong style={{ color: '#01a982' }}>{entries.length}</strong> {entries.length === 1 ? 'entry' : 'entries'}
-          {entries[0] && <span style={{ color: '#627282', fontWeight: 400 }}> &nbsp;·&nbsp; Week of {entries[0].weekOf}</span>}
-        </span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
-          {distributionList && (
-            <button onClick={copyTo} style={{ ...actionBtn, background: copiedHtml ? '#006b52' : '#3a4a5c' }}>
-              {copied ? '✓ Copied!' : `Copy To: ${distributionList}`}
-            </button>
-          )}
-          <button onClick={copyHtml} style={{ ...actionBtn, background: copiedHtml ? '#006b52' : '#01a982' }}>
-            {copiedHtml ? '✓ Copied!' : 'Copy Email HTML'}
+      {/* COMPOSE HEADER */}
+      <div style={{ background: '#fff', border: '1px solid #d1d9e0', borderRadius: 6, padding: '20px 24px', marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px', marginBottom: 12 }}>
+          <div>
+            <label style={fieldLabel}>To</label>
+            <input style={fieldInput} value={to} onChange={e => setTo(e.target.value)} placeholder="distribution list or email" />
+          </div>
+          <div>
+            <label style={fieldLabel}>CC</label>
+            <input style={fieldInput} value={cc} onChange={e => setCc(e.target.value)} placeholder="optional" />
+          </div>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={fieldLabel}>Subject</label>
+            <input style={fieldInput} value={subject} onChange={e => setSubject(e.target.value)} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            onClick={handleSend}
+            disabled={sending}
+            style={{
+              background: sending ? '#627282' : '#01a982', color: '#fff', border: 'none',
+              borderRadius: 4, padding: '10px 28px', fontFamily: "'IBM Plex Mono',monospace",
+              fontSize: 13, fontWeight: 700, cursor: sending ? 'default' : 'pointer',
+              textTransform: 'uppercase', letterSpacing: '0.06em'
+            }}>
+            {sending ? 'Sending…' : '✉ Send'}
           </button>
+          <span style={{ fontSize: 11, color: '#627282', fontFamily: "'IBM Plex Mono',monospace" }}>
+            {entries.length} {entries.length === 1 ? 'entry' : 'entries'}{entries[0] ? ` · Week of ${entries[0].weekOf}` : ''}
+          </span>
+          {sendMsg && <span style={{ fontSize: 13, fontWeight: 600, color: sendMsg.includes('success') ? '#01a982' : '#d13438' }}>{sendMsg}</span>}
         </div>
       </div>
 
+      {/* PREVIEW */}
       {entries.length === 0 ? (
         <div style={{ background: '#fff', border: '1px solid #d1d9e0', borderRadius: 6, padding: 48, textAlign: 'center', color: '#627282' }}>
-          <div style={{ fontSize: 32, marginBottom: 16 }}>📭</div>
-          <p>No published entries found. Publish some entries first.</p>
+          <p>No published entries found for the latest week. Publish some entries first.</p>
         </div>
       ) : (
-        <>
-          <p style={{ fontSize: 13, color: '#627282', marginBottom: 12 }}>
-            Preview below. Click <strong>Copy Email HTML</strong>, then paste into Outlook using <strong>Paste Special → HTML</strong> (or paste into a new email body in Outlook on the web).
-          </p>
-          <iframe
-            title="Email Preview"
-            srcDoc={htmlOutput}
-            style={{ width: '100%', height: 600, border: '2px solid #d1d9e0', borderRadius: 6, background: '#fff' }}
-          />
-          <div style={{ marginTop: 12 }}>
-            <details>
-              <summary style={{ fontSize: 12, color: '#627282', cursor: 'pointer', fontFamily: "'IBM Plex Mono',monospace" }}>Show raw HTML</summary>
-              <textarea readOnly value={htmlOutput} style={{ width: '100%', height: 200, fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, marginTop: 8, border: '1px solid #d1d9e0', borderRadius: 4, padding: 10, boxSizing: 'border-box' }} />
-            </details>
-          </div>
-        </>
+        <iframe
+          title="Email Preview"
+          srcDoc={htmlOutput}
+          style={{ width: '100%', height: 700, border: '1px solid #d1d9e0', borderRadius: 6, background: '#fff' }}
+        />
       )}
     </div>
   );
-};
-
-const actionBtn: React.CSSProperties = {
-  fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, fontWeight: 700, padding: '8px 16px',
-  borderRadius: 4, border: 'none', color: '#fff', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.06em'
 };
 
 export default TimbitEmailPreview;
