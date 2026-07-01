@@ -11,13 +11,8 @@
   .top-bar .logo { font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #01a982; }
   .top-bar .sub  { font-family: 'Courier New', monospace; font-size: 12px; color: #627282; margin-left: 6px; }
   .top-bar .badge { margin-left: auto; font-family: 'Courier New', monospace; font-size: 11px; color: #a0b4c8; background: #0d1620; padding: 4px 10px; border-radius: 3px; }
-  .layout { display: flex; min-height: 100vh; }
-  .sidebar { width: 200px; background: #fff; border-right: 2px solid #d1d9e0; padding: 20px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
-  .sidebar h3 { font-family: 'Courier New', monospace; font-size: 10px; font-weight: 700; color: #627282; text-transform: uppercase; letter-spacing: 0.10em; padding: 0 16px 8px; border-bottom: 1px solid #e0e6ec; margin-bottom: 8px; }
-  .sidebar a { display: block; padding: 6px 16px; font-size: 12px; color: #2a3a4a; text-decoration: none; border-left: 3px solid transparent; }
-  .sidebar a:hover { background: #f0f2f5; border-left-color: #01a982; color: #01a982; }
-  .sidebar .gap { height: 12px; }
-  .content { flex: 1; padding: 28px 36px 80px; }
+  .layout { display: block; }
+  .content { padding: 28px 36px 80px; max-width: 860px; margin: 0 auto; }
   h1 { font-size: 22px; font-weight: 700; color: #1a2332; margin-bottom: 4px; }
   h2 { font-size: 16px; font-weight: 700; color: #1a2332; margin: 36px 0 10px; padding-bottom: 8px; border-bottom: 2px solid #01a982; }
   h3 { font-size: 13px; font-weight: 700; color: #1a2332; margin: 20px 0 6px; }
@@ -52,27 +47,6 @@
   <span class="badge">Admins Only</span>
 </div>
 <div class="layout">
-  <nav class="sidebar">
-    <h3>Contents</h3>
-    <a href="#overview">Overview</a>
-    <a href="#access">Admin Access</a>
-    <div class="gap"></div>
-    <h3>Weekly Workflow</h3>
-    <a href="#add">Adding an Entry</a>
-    <a href="#publish">Publishing</a>
-    <a href="#email">Generating Email</a>
-    <a href="#send">Sending Email</a>
-    <div class="gap"></div>
-    <h3>Tools</h3>
-    <a href="#import">Import History</a>
-    <a href="#pane">Property Pane</a>
-    <div class="gap"></div>
-    <h3>Reference</h3>
-    <a href="#fields">Field Reference</a>
-    <a href="#cats">Categories</a>
-    <a href="#formats">Formats</a>
-    <a href="#trouble">Troubleshooting</a>
-  </nav>
   <main class="content">
 
     <h1>Tim·bit History — Admin Guide</h1>
