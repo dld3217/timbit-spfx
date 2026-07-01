@@ -3,7 +3,7 @@
   "solution": {
     "name": "timbit-spfx-client-side-solution",
     "id": "e5e87860-e2cb-43da-8f1c-6f6bdfa00b2e",
-    "version": "1.0.8.0",
+    "version": "1.0.9.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
@@ -26,7 +26,7 @@
         "title": "timbit-spfx Feature",
         "description": "The feature that activates elements of the timbit-spfx solution.",
         "id": "2a6dfec8-c690-48ad-95de-82a492661613",
-        "version": "1.0.8.0"
+        "version": "1.0.9.0"
       }
     ]
   },
@@ -34,6 +34,7 @@
     "zippedPackage": "solution/timbit-spfx.sppkg"
   }
 }
+
 
 
 
