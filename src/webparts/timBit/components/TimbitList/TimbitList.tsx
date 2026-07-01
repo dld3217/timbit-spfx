@@ -145,45 +145,76 @@ const TimbitList: React.FC<ITimbitListProps> = ({ entries, isAdmin }) => {
             <div style={{ fontSize: 40, marginBottom: 16 }}>📡</div>
             <p>No Tim·bits match your search. Try different keywords or clear the filters.</p>
           </div>
-        ) : filtered.map(entry => (
-          <div key={entry.id} style={{
-            border: `1px solid ${openId === entry.id ? '#01a982' : '#d1d9e0'}`,
-            borderRadius: 6, background: '#fff', marginBottom: 10, overflow: 'hidden',
-            boxShadow: openId === entry.id ? '0 0 0 1px #01a982, 0 4px 16px rgba(1,169,130,0.10)' : undefined
-          }}>
-            {/* HEADER ROW */}
-            <div onClick={() => setOpenId(openId === entry.id ? null : entry.id)}
-              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 18px', cursor: 'pointer', userSelect: 'none' }}>
-              <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700, color: '#000', whiteSpace: 'nowrap', minWidth: 82 }}>{entry.date}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#1a2332', flex: 1 }}>{highlight(entry.title, search)}</span>
-              {isAdmin && !entry.published && (
-                <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'IBM Plex Mono',monospace", background: '#fff8e0', color: '#7a5000', border: '1px solid #e0c060', borderRadius: 2, padding: '2px 6px', textTransform: 'uppercase' }}>Draft</span>
-              )}
-              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                {entry.categories.map(cat => {
-                  const c = CAT_COLORS[cat] || { bg: '#f4f4f4', color: '#303030', border: '#b0b0b0' };
-                  return (
-                    <span key={cat} style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 2, background: c.bg, color: c.color, border: `1px solid ${c.border}`, textTransform: 'uppercase' }}>{cat}</span>
-                  );
-                })}
-              </div>
-              <span style={{ color: '#627282', fontSize: 13, marginLeft: 4, transform: openId === entry.id ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.2s' }}>▾</span>
-            </div>
+        ) : (() => {
+          const latestWeek = filtered[0]?.weekOf;
+          const thisWeek   = !hasFilters ? filtered.filter(e => e.weekOf === latestWeek) : [];
+          const archive    = !hasFilters ? filtered.filter(e => e.weekOf !== latestWeek) : filtered;
 
-            {/* BODY */}
-            {openId === entry.id && (
-              <div style={{ padding: '0 18px 16px', borderTop: '1px solid #e0e6ec' }}>
-                <p style={{ fontSize: 13.5, color: '#2a3a4a', lineHeight: 1.65, padding: '14px 0 12px' }}>{highlight(entry.body, search)}</p>
-                <a href={entry.link} target="_blank" rel="noreferrer" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 600,
-                  color: '#006b52', textDecoration: 'none', border: '1px solid #01a982',
-                  borderRadius: 3, padding: '5px 10px'
-                }}>↗ View Resource</a>
+          const renderCard = (entry: ITimbit, isNew: boolean) => (
+            <div key={entry.id} style={{
+              border: `1px solid ${openId === entry.id ? '#01a982' : isNew ? '#01a982' : '#d1d9e0'}`,
+              borderLeft: isNew ? '4px solid #01a982' : undefined,
+              borderRadius: 6, background: '#fff', marginBottom: 10, overflow: 'hidden',
+              boxShadow: openId === entry.id ? '0 0 0 1px #01a982, 0 4px 16px rgba(1,169,130,0.10)' : undefined
+            }}>
+              <div onClick={() => setOpenId(openId === entry.id ? null : entry.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 18px', cursor: 'pointer', userSelect: 'none' }}>
+                <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700, color: '#000', whiteSpace: 'nowrap', minWidth: 82 }}>{entry.date}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#1a2332', flex: 1 }}>{highlight(entry.title, search)}</span>
+                {isAdmin && !entry.published && (
+                  <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'IBM Plex Mono',monospace", background: '#fff8e0', color: '#7a5000', border: '1px solid #e0c060', borderRadius: 2, padding: '2px 6px', textTransform: 'uppercase' }}>Draft</span>
+                )}
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  {entry.categories.map(cat => {
+                    const c = CAT_COLORS[cat] || { bg: '#f4f4f4', color: '#303030', border: '#b0b0b0' };
+                    return (
+                      <span key={cat} style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 2, background: c.bg, color: c.color, border: `1px solid ${c.border}`, textTransform: 'uppercase' }}>{cat}</span>
+                    );
+                  })}
+                </div>
+                <span style={{ color: '#627282', fontSize: 13, marginLeft: 4, transform: openId === entry.id ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.2s' }}>▾</span>
               </div>
-            )}
-          </div>
-        ))}
+              {openId === entry.id && (
+                <div style={{ padding: '0 18px 16px', borderTop: '1px solid #e0e6ec' }}>
+                  <p style={{ fontSize: 13.5, color: '#2a3a4a', lineHeight: 1.65, padding: '14px 0 12px' }}>{highlight(entry.body, search)}</p>
+                  <a href={entry.link} target="_blank" rel="noreferrer" style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 600,
+                    color: '#006b52', textDecoration: 'none', border: '1px solid #01a982',
+                    borderRadius: 3, padding: '5px 10px'
+                  }}>↗ View Resource</a>
+                </div>
+              )}
+            </div>
+          );
+
+          return (
+            <>
+              {thisWeek.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ background: '#1a2332', borderRadius: '6px 6px 0 0', padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700, color: '#01a982', textTransform: 'uppercase', letterSpacing: '0.10em' }}>This Week</span>
+                    <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: '#627282' }}>Week of {latestWeek}</span>
+                    <span style={{ marginLeft: 'auto', fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700, color: '#a0b4c8' }}>{thisWeek.length} {thisWeek.length === 1 ? 'entry' : 'entries'}</span>
+                  </div>
+                  <div style={{ background: '#f0faf6', border: '1px solid #01a982', borderTop: 'none', borderRadius: '0 0 6px 6px', padding: '12px 12px 4px' }}>
+                    {thisWeek.map(e => renderCard(e, true))}
+                  </div>
+                </div>
+              )}
+              {archive.length > 0 && (
+                <>
+                  {thisWeek.length > 0 && (
+                    <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fontWeight: 700, color: '#627282', textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 12, paddingBottom: 8, borderBottom: '2px solid #d1d9e0' }}>
+                      Archive — {archive.length} entries
+                    </div>
+                  )}
+                  {archive.map(e => renderCard(e, false))}
+                </>
+              )}
+            </>
+          );
+        })()}
       </div>
     </div>
   );
