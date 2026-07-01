@@ -39,10 +39,16 @@ export async function getAllTimBits(sp: SPFI): Promise<ITimbit[]> {
   return items.map(mapItem);
 }
 
+function toSpDate(d: string): string | null {
+  if (!d) return null;
+  const iso = new Date(d.replace(/\//g, '-')).toISOString();
+  return iso;
+}
+
 export async function createTimBit(sp: SPFI, data: Omit<ITimbit, 'id'>): Promise<number> {
   const result = await sp.web.lists.getByTitle(LIST_NAME).items.add({
     Title: data.title,
-    TBDate: data.date,
+    TBDate: toSpDate(data.date),
     WeekOf: data.weekOf,
     Body: data.body,
     Link: data.link,
@@ -57,7 +63,7 @@ export async function createTimBit(sp: SPFI, data: Omit<ITimbit, 'id'>): Promise
 export async function updateTimBit(sp: SPFI, id: number, data: Partial<ITimbit>): Promise<void> {
   const payload: any = {};
   if (data.title !== undefined)      payload.Title = data.title;
-  if (data.date !== undefined)       payload.TBDate = data.date;
+  if (data.date !== undefined)       payload.TBDate = toSpDate(data.date);
   if (data.weekOf !== undefined)     payload.WeekOf = data.weekOf;
   if (data.body !== undefined)       payload.Body = data.body;
   if (data.link !== undefined)       payload.Link = data.link;
