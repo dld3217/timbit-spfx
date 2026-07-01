@@ -11,7 +11,7 @@ function mapItem(item: any): ITimbit {
   return {
     id: item.Id,
     title: item.Title || '',
-    date: item.TBDate || '',
+    date: item.TBDate ? item.TBDate.substring(0, 10).replace(/-/g, '/') : '',
     weekOf: item.WeekOf || '',
     body: item.Body || '',
     link: item.Link || '',
