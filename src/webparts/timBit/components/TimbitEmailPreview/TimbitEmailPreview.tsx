@@ -96,8 +96,6 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
   const [htmlOutput, setHtmlOutput] = React.useState('');
   const [copied, setCopied] = React.useState(false);
   const [copiedHtml, setCopiedHtml] = React.useState(false);
-  const iframeRef = React.useRef<HTMLIFrameElement>(null);
-
   React.useEffect(() => {
     getLatestWeekTimBits(sp).then(data => {
       setEntries(data);
@@ -105,13 +103,6 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
       setLoading(false);
     });
   }, [sp]);
-
-  React.useEffect(() => {
-    if (iframeRef.current && htmlOutput) {
-      const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
-      if (doc) { doc.open(); doc.write(htmlOutput); doc.close(); }
-    }
-  }, [htmlOutput]);
 
   const copyHtml = () => {
     navigator.clipboard.writeText(htmlOutput).then(() => {
@@ -161,8 +152,8 @@ const TimbitEmailPreview: React.FC<ITimbitEmailPreviewProps> = ({ sp, distributi
             Preview below. Click <strong>Copy Email HTML</strong>, then paste into Outlook using <strong>Paste Special → HTML</strong> (or paste into a new email body in Outlook on the web).
           </p>
           <iframe
-            ref={iframeRef}
             title="Email Preview"
+            srcDoc={htmlOutput}
             style={{ width: '100%', height: 600, border: '2px solid #d1d9e0', borderRadius: 6, background: '#fff' }}
           />
           <div style={{ marginTop: 12 }}>
